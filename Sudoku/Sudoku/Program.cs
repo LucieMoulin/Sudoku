@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿///ETML
+///Auteur : Lucie Moulin
+///Date : 29.08.2019
+///Description : programme principal de l'application sudoku
+
+using System;
 using System.Windows.Forms;
 
 namespace Sudoku
 {
+    /// <summary>
+    /// Programme principal
+    /// </summary>
     static class Program
     {
         /// <summary>
@@ -16,7 +21,7 @@ namespace Sudoku
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new SudokuView());
         }
     }
 }

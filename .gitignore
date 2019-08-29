@@ -1,0 +1,6 @@
+
+Sudoku/.vs/
+
+*.cache
+
+Sudoku/Sudoku/obj/Debug/TemporaryGeneratedFile*

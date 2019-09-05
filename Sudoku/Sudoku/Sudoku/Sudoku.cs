@@ -1,0 +1,137 @@
+﻿
+using System.Collections.Generic;
+///ETML
+///Auteur : Lucie Moulin
+///Date : 05.09.2019
+///Description : Représente un sudoku
+namespace Sudoku.Sudoku
+{
+    /// <summary>
+    /// Représente un sudoku
+    /// </summary>
+    public class Sudoku
+    {
+        private SudokuCell[,] grid;
+        private SudokuType type;
+
+        /// <summary>
+        /// Grille
+        /// </summary>
+        public SudokuCell[,] Grid { get => grid; set => grid = value; }
+
+        /// <summary>
+        /// Type de sudoku
+        /// </summary>
+        public SudokuType Type { get => type; }
+
+        /// <summary>
+        /// Constructeur
+        /// </summary>
+        /// <param name="type">Type de sudoku</param>
+        public Sudoku(SudokuType type = SudokuType.Numeric9)
+        {
+            this.type = type;
+            switch (type)
+            {
+                default:
+                case SudokuType.Numeric9:
+                    InitGrid(9);
+                    break;
+
+                case SudokuType.Numeric4:
+                    InitGrid(4);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Initialise la grille du sudoku
+        /// </summary>
+        private void InitGrid(int size)
+        {
+            grid = new SudokuCell[size, size];
+
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    //Initialisation de chaque cellule
+                    grid[i, j] = new SudokuCell(this);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Charge un fichier .sudoku
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void Load(string fileName)
+        {
+            Sudoku newSudoku = SudokuSaver.Load(fileName);
+            grid = newSudoku.grid;
+            type = newSudoku.type;
+        }
+
+        /// <summary>
+        /// Sauvegarde la partie vers un fichier .sudoku
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public bool Save(string fileName)
+        {
+            return SudokuSaver.Save(fileName, this);
+        }
+
+        /// <summary>
+        /// Vérifie que le sudoku ne soit pas terminé
+        /// </summary>
+        /// <returns></returns>
+        public bool IsCompleted()
+        {
+            switch(type)
+            {
+                default:
+                case SudokuType.Numeric9:
+                    bool isCompleted = true;
+
+                    //Vérification des lignes
+                    for(int y = 0; y < grid.GetLength(0); y++)
+                    {
+                        isCompleted = isCompleted && CheckLine(y);
+                    }
+
+
+
+
+                    break;
+            }
+        }
+
+
+        private bool CheckLine(int line)
+        {
+            //Liste de chiffres déjà utilisés
+            List<byte> usedNumbers = new List<byte>();
+            
+            //Parcours de toute la ligne
+            for(int x = 0; x < grid.GetLength(0);x++)
+            {                
+                if(grid[line, x].Number != 0 && !usedNumbers.Contains(grid[line, x].Number))
+                {
+                    usedNumbers.Add(grid[line, x].Number);
+                }
+            }
+
+            return usedNumbers.Count == grid.GetLength(0);
+        }
+
+        private bool CheckColumn(int column)
+        {
+            for (int y = 0; y < grid.GetLength(0); y++)
+            {
+
+            }
+        }
+    }
+}

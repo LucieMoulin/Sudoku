@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8458BA57-9EA7-4D07-8BEE-7A1BDFB3091F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Sudoku</RootNamespace>
-    <AssemblyName>Sudoku</AssemblyName>
+    <RootNamespace>SudokuGame</RootNamespace>
+    <AssemblyName>SudokuGame</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SudokuCellView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SudokuCellView.Designer.cs">
+      <DependentUpon>SudokuCellView.cs</DependentUpon>
+    </Compile>
     <Compile Include="SudokuView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -65,7 +71,11 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SudokuCellView.resx">
+      <DependentUpon>SudokuCellView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SudokuView.resx">
       <DependentUpon>SudokuView.cs</DependentUpon>
     </EmbeddedResource>

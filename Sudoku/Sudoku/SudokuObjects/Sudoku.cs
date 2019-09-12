@@ -53,12 +53,12 @@ namespace SudokuGame.SudokuObjects
         {
             grid = new SudokuCell[size, size];
 
-            for (int i = 0; i < size; i++)
+            for (int y = 0; y < size; y++)
             {
-                for (int j = 0; j < size; j++)
+                for (int x = 0; x < size; x++)
                 {
                     //Initialisation de chaque cellule
-                    grid[i, j] = new SudokuCell(this);
+                    grid[y, x] = new SudokuCell(this, x, y);
                 }
             }
         }
@@ -91,37 +91,30 @@ namespace SudokuGame.SudokuObjects
         /// <returns></returns>
         public bool IsCompleted()
         {
-            switch (type)
+            bool isCompleted = true;
+
+            //Vérification des lignes
+            for (int y = 0; y < grid.GetLength(0); y++)
             {
-                default:
-                case SudokuType.Numeric9:
-                    bool isCompleted = true;
-
-                    //Vérification des lignes
-                    for (int y = 0; y < grid.GetLength(0); y++)
-                    {
-                        isCompleted = isCompleted && CheckLine(y);
-                    }
-
-                    if (isCompleted)
-                    {
-                        //Vérification des colonnes 
-                        for (int x = 0; x < grid.GetLength(0); x++)
-                        {
-                            isCompleted = isCompleted && CheckColumn(x);
-                        }
-                    }
-
-                    if (isCompleted)
-                    {
-                        //Vérification des carrés
-                        isCompleted = isCompleted && CheckSquares();
-                    }
-
-                    return isCompleted;
-                case SudokuType.Numeric4:
-                    throw new NotImplementedException("Sudoku 4x4 non-implémenté");
+                isCompleted = isCompleted && CheckLine(y);
             }
+
+            if (isCompleted)
+            {
+                //Vérification des colonnes 
+                for (int x = 0; x < grid.GetLength(0); x++)
+                {
+                    isCompleted = isCompleted && CheckColumn(x);
+                }
+            }
+
+            if (isCompleted)
+            {
+                //Vérification des carrés
+                isCompleted = isCompleted && CheckSquares();
+            }
+
+            return isCompleted;
         }
 
         /// <summary>
@@ -204,7 +197,7 @@ namespace SudokuGame.SudokuObjects
             {
                 for (int x = 0; x < Math.Sqrt(grid.GetLength(0)); x++)
                 {
-                    if (grid[y, x].Number != 0 && !usedNumbers.Contains(grid[y, x].Number))
+                    if (grid[y + yMin, x + xMin].Number != 0 && !usedNumbers.Contains(grid[y + yMin, x + xMin].Number))
                     {
                         usedNumbers.Add(grid[y + yMin, x + xMin].Number);
                     }

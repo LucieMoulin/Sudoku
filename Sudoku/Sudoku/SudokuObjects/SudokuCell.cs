@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace Sudoku.Sudoku
+namespace SudokuGame.SudokuObjects
 {
     /// <summary>
     /// Représente une case de la grille du sudoku

@@ -7,14 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SudokuGame.SudokuObjects;
 
-namespace Sudoku
+namespace SudokuGame
 {
     public partial class SudokuView : Form
     {
+        private Sudoku sudoku;
+
+
         public SudokuView()
         {
             InitializeComponent();
+
+            sudoku = new Sudoku();
         }
     }
 }

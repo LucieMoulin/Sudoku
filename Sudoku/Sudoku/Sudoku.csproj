@@ -53,10 +53,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sudoku\SudokuSaver.cs" />
-    <Compile Include="Sudoku\Sudoku.cs" />
-    <Compile Include="Sudoku\SudokuCell.cs" />
-    <Compile Include="Sudoku\SudokuType.cs" />
+    <Compile Include="SudokuObjects\SudokuSaver.cs" />
+    <Compile Include="SudokuObjects\Sudoku.cs" />
+    <Compile Include="SudokuObjects\SudokuCell.cs" />
+    <Compile Include="SudokuObjects\SudokuType.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

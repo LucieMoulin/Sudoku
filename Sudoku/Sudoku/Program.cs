@@ -6,7 +6,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace Sudoku
+namespace SudokuGame
 {
     /// <summary>
     /// Programme principal

@@ -1,4 +1,4 @@
-﻿namespace Sudoku
+﻿namespace SudokuGame
 {
     partial class SudokuView
     {

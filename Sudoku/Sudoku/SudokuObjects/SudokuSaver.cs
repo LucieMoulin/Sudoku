@@ -8,7 +8,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Sudoku.Sudoku
+namespace SudokuGame.SudokuObjects
 {
     /// <summary>
     /// Sauvegardeur de partie

@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator\SudokuGenerator.cs" />
+    <Compile Include="Solver\SudokuSolver.cs" />
     <Compile Include="SudokuCellView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -92,9 +94,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Generator\" />
-    <Folder Include="Solver\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

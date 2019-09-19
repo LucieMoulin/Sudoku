@@ -36,10 +36,11 @@
             // labelNumber
             // 
             this.labelNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold);
-            this.labelNumber.Location = new System.Drawing.Point(-5, 10);
+            this.labelNumber.Location = new System.Drawing.Point(3, 0);
             this.labelNumber.Name = "labelNumber";
-            this.labelNumber.Size = new System.Drawing.Size(35, 40);
+            this.labelNumber.Size = new System.Drawing.Size(44, 50);
             this.labelNumber.TabIndex = 0;
+            this.labelNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.labelNumber.Click += new System.EventHandler(this.LabelNumber_Click);
             // 
             // labelSmallNumbers1

@@ -4,13 +4,7 @@
 ///Description : Reporésentation d'une case de sudoku
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 
@@ -29,7 +23,10 @@ namespace SudokuGame
                 labelNumber.Text = value;
                 if (value != "")
                 {
-                    ((SudokuView)Parent).CheckVictory();
+                    if (Parent != null)
+                    {
+                        ((SudokuView)Parent).CheckVictory();
+                    }
                     labelSmallNumbers1.Visible = false;
                     labelSmallNumbers2.Visible = false;
                 }
@@ -50,6 +47,13 @@ namespace SudokuGame
             InitializeComponent();
 
             this.cell = cell;
+
+            if (cell.Number != 0)
+            {
+                mainNumber = cell.Number.ToString();
+            }
+
+            UpdateSmallNumbersDisplay();
         }
 
         /// <summary>
@@ -90,7 +94,7 @@ namespace SudokuGame
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             //Affichage de l'aide
-            if (Focused)
+            if (!cell.IsFixed && Focused)
             {
                 switch (keyData)
                 {
@@ -265,7 +269,7 @@ namespace SudokuGame
                     case Keys.Up:
                         if (cell.Y > 0)
                         {
-                            ((SudokuView)Parent).CellGrid[cell.Y - 1,cell.X].Focus();
+                            ((SudokuView)Parent).CellGrid[cell.Y - 1, cell.X].Focus();
                         }
                         return true;
                     case Keys.Down:

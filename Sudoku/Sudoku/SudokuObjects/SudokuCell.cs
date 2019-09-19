@@ -74,13 +74,15 @@ namespace SudokuGame.SudokuObjects
         /// Entre le chiffre principal
         /// </summary>
         /// <param name="number"></param>
-        public void EditNumber(byte number)
+        /// <returns>Sudoku terminé</returns>
+        public bool EditNumber(byte number)
         {            
             if (!isFixed && number <= maxNumber)
             {
                 this.number = number;
-                parent.IsCompleted();
+                return parent.IsCompleted();
             }
+            return false;
         }
 
         /// <summary>

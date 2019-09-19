@@ -3,16 +3,12 @@
 ///Date : 29.08.2019
 ///Description : Vue du Sudoku
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
+using SudokuGame.Solver;
+using SudokuGame.Generator;
+
 
 namespace SudokuGame
 {
@@ -23,6 +19,8 @@ namespace SudokuGame
     {
         private Sudoku sudoku;
         private SudokuCellView[,] cellGrid;
+        private SudokuGenerator generator;
+        private SudokuSolver solver;
 
         /// <summary>
         /// Grille de cellules
@@ -35,8 +33,11 @@ namespace SudokuGame
         public SudokuView()
         {
             InitializeComponent();
+            
+            generator = new SudokuGenerator();
+            sudoku = generator.NewRandomSudoku();
+            solver = new SudokuSolver(sudoku);
 
-            sudoku = new Sudoku();
             switch (sudoku.Type)
             {
                 default:
@@ -57,18 +58,21 @@ namespace SudokuGame
         private void DisplaySudoku()
         {
             Controls.Clear();
+            InitializeComponent();
 
-            Width = sudoku.Grid.GetLength(0) * 50 + 16;
-            Height = sudoku.Grid.GetLength(0) * 50 + 38;
+            int length = sudoku.Grid.GetLength(0);
+
+            Width = length * 50 + 16;
+            Height = length * 50 + 62;
 
             //Parcours de la grille du sudoku, et affichage de chaque case.
-            for (int y = 0; y < sudoku.Grid.GetLength(0); y++)
+            for (int y = 0; y < length; y++)
             {
-                for (int x = 0; x < sudoku.Grid.GetLength(0); x++)
+                for (int x = 0; x < length; x++)
                 {
                     cellGrid[y,x] = new SudokuCellView(sudoku.Grid[y, x]);
                     int intX = x * cellGrid[y, x].Width - 1;
-                    int intY = y * cellGrid[y, x].Height - 1;
+                    int intY = y * cellGrid[y, x].Height + 24;
                     if (sudoku.Type == SudokuType.Numeric9)
                     {
                         if (x > 2)
@@ -109,6 +113,12 @@ namespace SudokuGame
             {
                 MessageBox.Show("Vous avez terminé votre sudoku !", "Bravo !");
             }
+        }
+
+        private void SolveToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            solver.SolveSudoku();
+            DisplaySudoku();
         }
     }
 }

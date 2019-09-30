@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 using SudokuGame.Solver;
 using SudokuGame.Generator;
-
+using System.Threading;
 
 namespace SudokuGame
 {
@@ -21,6 +21,8 @@ namespace SudokuGame
         private SudokuCellView[,] cellGrid;
         private SudokuGenerator generator;
         private SudokuSolver solver;
+        private int progress = 0;
+        private Thread solveThread;
 
         /// <summary>
         /// Grille de cellules
@@ -33,10 +35,11 @@ namespace SudokuGame
         public SudokuView()
         {
             InitializeComponent();
-            
+
             generator = new SudokuGenerator();
             sudoku = generator.NewRandomSudoku();
-            solver = new SudokuSolver(sudoku);
+            solver = new SudokuSolver(sudoku, this);
+            solveThread = new Thread(() => { solver.SolveSudoku(); });
 
             switch (sudoku.Type)
             {
@@ -70,7 +73,7 @@ namespace SudokuGame
             {
                 for (int x = 0; x < length; x++)
                 {
-                    cellGrid[y,x] = new SudokuCellView(sudoku.Grid[y, x]);
+                    cellGrid[y, x] = new SudokuCellView(sudoku.Grid[y, x]);
                     int intX = x * cellGrid[y, x].Width - 1;
                     int intY = y * cellGrid[y, x].Height + 24;
                     if (sudoku.Type == SudokuType.Numeric9)
@@ -105,6 +108,29 @@ namespace SudokuGame
         }
 
         /// <summary>
+        /// Met à jour le sudoku
+        /// </summary>
+        public void UpdateSudoku()
+        {
+            int length = sudoku.Grid.GetLength(0);
+
+            Width = length * 50 + 16;
+            Height = length * 50 + 62;
+
+            //Parcours de la grille du sudoku, et affichage de chaque case.
+            for (int y = 0; y < length; y++)
+            {
+                for (int x = 0; x < length; x++)
+                {
+                    if(sudoku.Grid[y, x].Number != cellGrid[y, x].DisplayedNumber || sudoku.Grid[y, x].SmallNumbers.Count != cellGrid[y, x].DisplayedSmallNumbers.Count)
+                    {
+                        cellGrid[y, x].UpdateDisplay();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Vérifie si le sudoku est terminé, et affiche un message de victoire le cas échéant.
         /// </summary>
         public void CheckVictory()
@@ -117,8 +143,12 @@ namespace SudokuGame
 
         private void SolveToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            solver.SolveSudoku();
-            DisplaySudoku();
+            solveThread.Start();
+        }
+
+        private void SudokuView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            solveThread.Abort();
         }
     }
 }

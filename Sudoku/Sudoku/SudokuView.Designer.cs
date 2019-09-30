@@ -70,6 +70,7 @@
             this.Name = "SudokuView";
             this.ShowIcon = false;
             this.Text = "Sudoku";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SudokuView_FormClosing);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.ResumeLayout(false);

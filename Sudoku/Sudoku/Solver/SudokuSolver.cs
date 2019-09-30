@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 
 namespace SudokuGame.Solver
@@ -17,11 +18,24 @@ namespace SudokuGame.Solver
     /// </summary>
     public class SudokuSolver
     {
-        private Sudoku sudoku;
+        /// <summary>
+        /// États de résolution
+        /// </summary>
+        private enum SolveState
+        {
+            Solved,
+            Solving,
+            FoundNumber,
+            UnableToSolve
+        }
 
-        public SudokuSolver(Sudoku sudoku)
+        private Sudoku sudoku;
+        private SudokuView observer;
+
+        public SudokuSolver(Sudoku sudoku, SudokuView observer = null)
         {
             this.sudoku = sudoku;
+            this.observer = observer;
         }
 
         public bool IsSudokuValid()
@@ -33,7 +47,28 @@ namespace SudokuGame.Solver
         {
             RecursivePlaceSmallNumbers(0, 0, 1);
 
-            //TreatSmallNumbers(0, 0);
+            RecursiveSolveSudoku();
+        }
+
+        /// <summary>
+        /// Résoud le sudoku
+        /// </summary>
+        /// <returns></returns>
+        private SolveState RecursiveSolveSudoku()
+        {
+            SolveState uniqueState = TreatUniqueSmallNumbers(0, 0, SolveState.Solving);
+            SolveState lineState = TreatLineSmallNumbers(0, SolveState.Solving);
+            SolveState columnState = TreatColumnSmallNumbers(0, SolveState.Solving);
+            SolveState squareState = TreatSquareSmallNumbers(0, 0, SolveState.Solving);
+
+            if(uniqueState == SolveState.UnableToSolve && lineState == SolveState.UnableToSolve && columnState == SolveState.UnableToSolve && squareState == SolveState.UnableToSolve)
+            {
+                return SolveState.UnableToSolve;
+            }
+            else
+            {
+                return RecursiveSolveSudoku();
+            }
         }
 
         /// <summary>
@@ -54,6 +89,15 @@ namespace SudokuGame.Solver
             {
                 //Ajout du petit chiffre
                 sudoku.Grid[line, column].AddSmallNumber(number);
+
+                //Mise à jour de l'observateur
+                if (observer != null)
+                {
+                    observer.Invoke((MethodInvoker)(() =>
+                    {
+                        observer.UpdateSudoku();
+                    }));
+                }
             }
 
             //Vérification dépassment vérical
@@ -84,15 +128,19 @@ namespace SudokuGame.Solver
                 }
             }
         }
-        
+
         /// <summary>
-        /// Traite les petits chiffres
+        /// Valide récursivement les petits chiffres seuls
         /// </summary>
         /// <param name="line"></param>
         /// <param name="column"></param>
-        private void TreatSmallNumbers(int line, int column)
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private SolveState TreatUniqueSmallNumbers(int line, int column, SolveState state)
         {
             int length = sudoku.Grid.GetLength(0);
+
+            SolveState nextState = SolveState.Solving;
 
             //Si la case est modifiable
             if (!sudoku.Grid[line, column].IsFixed && sudoku.Grid[line, column].Number == 0)
@@ -103,11 +151,22 @@ namespace SudokuGame.Solver
                     if (sudoku.Grid[line, column].EditNumber(sudoku.Grid[line, column].SmallNumbers[0]))
                     {
                         //Sudoku terminé
-                        return;
+                        return SolveState.Solved;
                     }
                     else
                     {
                         RemoveSmallNumbers(line, column, sudoku.Grid[line, column].Number);
+
+                        state = SolveState.FoundNumber;
+                    }
+
+                    //Mise à jour de l'observateur
+                    if (observer != null)
+                    {
+                        observer.Invoke((MethodInvoker)(() =>
+                        {
+                            observer.UpdateSudoku();
+                        }));
                     }
                 }
             }
@@ -120,23 +179,342 @@ namespace SudokuGame.Solver
                 if (column < length - 1)
                 {
                     //Résoud à partir de la case à droite
-                    TreatSmallNumbers(line, column + 1);
+                    nextState = TreatUniqueSmallNumbers(line, column + 1, state);
+                }
+                //Si au bout de la ligne, changement de ligne
+                else
+                {
+                    //Si dernière case
+                    if (line == length - 1 && column == length - 1)
+                    {
+                        if (state != SolveState.Solving)
+                        {
+                            nextState = TreatUniqueSmallNumbers(0, 0, SolveState.Solving);
+                        }
+                    }
+                    else
+                    {
+                        //Résoud à partir de la première case de la ligne en dessous                        
+                        nextState = TreatUniqueSmallNumbers(line + 1, 0, state);
+                    }
+                }
+            }
+
+            //Si la suite n'a rien trouvé et que rien a été trouvé cette fois, retour que rien a été trouvé
+            switch (nextState)
+            {
+                case SolveState.FoundNumber:
+                case SolveState.Solved:
+                    return nextState;
+                default:
+                    if (state == SolveState.Solving)
+                    {
+                        return SolveState.UnableToSolve;
+                    }
+                    else
+                    {
+                        return state;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Regarde si une ligne contient un seul exemplaire d'un petit chiffre
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private SolveState TreatLineSmallNumbers(int line, SolveState state)
+        {
+            int length = sudoku.Grid.GetLength(0);
+
+            SolveState nextState = SolveState.Solving;
+
+            //Pour chaque chiffre
+            for (byte i = 1; i <= length; i++)
+            {
+                byte counter = 0;
+                byte index = 0;
+
+                //Vérification de chaque case
+                for (byte x = 0; x < length; x++)
+                {
+                    //Si la case n'est pas fixe, n'a pas de chiffre placé et contient le chiffre recherché, incrémentation du compteur
+                    if (!sudoku.Grid[line, x].IsFixed && sudoku.Grid[line, x].Number == 0 && sudoku.Grid[line, x].SmallNumbers.Contains(i))
+                    {
+                        counter++;
+                        index = x;
+                    }
+                }
+
+                //S'il y a une seule fois un exemplaire d'un petit chiffre, le placer
+                if (counter == 1)
+                {
+                    if (sudoku.Grid[line, index].EditNumber(i))
+                    {
+                        //Sudoku terminé
+                        return SolveState.Solved;
+                    }
+                    else
+                    {
+                        RemoveSmallNumbers(line, index, sudoku.Grid[line, index].Number);
+                        state = SolveState.FoundNumber;
+                    }
+
+                    //Mise à jour de l'observateur
+                    if (observer != null)
+                    {
+                        observer.Invoke((MethodInvoker)(() =>
+                        {
+                            observer.UpdateSudoku();
+                        }));
+                    }
+                }
+            }
+
+            //Passage à la prochaine ligne
+            //Vérification de dépassement vertical
+            if (line < length)
+            {
+                //Si dernière ligne, recommence au début
+                if (line == length - 1)
+                {
+                    //Si rien n'a été trouvé, ne recommence pas
+                    if (state != SolveState.Solving)
+                    {
+                        nextState = TreatLineSmallNumbers(0, SolveState.Solving);
+                    }
+                }
+                else
+                {
+                    //Résoud la prochaine ligne
+                    nextState = TreatLineSmallNumbers(line + 1, state);
+                }
+            }
+
+            //Retour de l'état
+            switch (nextState)
+            {
+                case SolveState.FoundNumber:
+                case SolveState.Solved:
+                    return nextState;
+                default:
+                    if (state == SolveState.Solving)
+                    {
+                        return SolveState.UnableToSolve;
+                    }
+                    else
+                    {
+                        return state;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Regarde si une colonne contient un seul exemplaire d'un petit chiffre
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private SolveState TreatColumnSmallNumbers(int column, SolveState state)
+        {
+            int length = sudoku.Grid.GetLength(0);
+
+            SolveState nextState = SolveState.Solving;
+
+            //Pour chaque chiffre
+            for (byte i = 1; i <= length; i++)
+            {
+                byte counter = 0;
+                byte index = 0;
+
+                //Vérification de chaque case
+                for (byte y = 0; y < length; y++)
+                {
+                    //Si la case n'est pas fixe, n'a pas de chiffre placé et contient le chiffre recherché, incrémentation du compteur
+                    if (!sudoku.Grid[y, column].IsFixed && sudoku.Grid[y, column].Number == 0 && sudoku.Grid[y, column].SmallNumbers.Contains(i))
+                    {
+                        counter++;
+                        index = y;
+                    }
+                }
+
+                //S'il y a une seule fois un exemplaire d'un petit chiffre, le placer
+                if (counter == 1)
+                {
+                    if (sudoku.Grid[index, column].EditNumber(i))
+                    {
+                        //Sudoku terminé
+                        return SolveState.Solved;
+                    }
+                    else
+                    {
+                        RemoveSmallNumbers(index, column, sudoku.Grid[index, column].Number);
+                        state = SolveState.FoundNumber;
+                    }
+
+                    //Mise à jour de l'observateur
+                    if (observer != null)
+                    {
+                        observer.Invoke((MethodInvoker)(() =>
+                        {
+                            observer.UpdateSudoku();
+                        }));
+                    }
+                }
+            }
+
+            //Passage à la prochaine ligne
+            //Vérification de dépassement horizontal
+            if (column < length)
+            {
+                //Si dernière colonne, recommence au début
+                if (column == length - 1)
+                {
+                    //Si rien n'a été trouvé, ne recommence pas
+                    if (state != SolveState.Solving)
+                    {
+                        nextState = TreatColumnSmallNumbers(0, SolveState.Solving);
+                    }
+                }
+                else
+                {
+                    //Résoud la prochaine colonne
+                    nextState = TreatColumnSmallNumbers(column + 1, state);
+                }
+            }
+
+            //Retour de l'état
+            switch (nextState)
+            {
+                case SolveState.FoundNumber:
+                case SolveState.Solved:
+                    return nextState;
+                default:
+                    if (state == SolveState.Solving)
+                    {
+                        return SolveState.UnableToSolve;
+                    }
+                    else
+                    {
+                        return state;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Regarde si un carré contient un seul exemplaire d'un petit chiffre
+        /// </summary>
+        /// <param name="xMin"></param>
+        /// <param name="yMin"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        private SolveState TreatSquareSmallNumbers(int xMin, int yMin, SolveState state)
+        {
+            int squareLength = (int)Math.Sqrt(sudoku.Grid.GetLength(0));
+            int length = sudoku.Grid.GetLength(0);
+
+            SolveState nextState = SolveState.Solving;
+
+            //Pour chaque chiffre
+            for (byte i = 1; i <= length; i++)
+            {
+                byte counter = 0;
+                int indexY = 0;
+                int indexX = 0;
+
+                //Parcours de tout le carré
+                for (int y = 0; y < squareLength; y++)
+                {
+                    for (int x = 0; x < squareLength; x++)
+                    {
+                        //Si la case n'est pas fixe, n'a pas de chiffre placé et contient le chiffre recherché, incrémentation du compteur
+                        if (!sudoku.Grid[y + yMin, x + xMin].IsFixed && sudoku.Grid[y + yMin, x + xMin].Number == 0 && sudoku.Grid[y + yMin, x + xMin].SmallNumbers.Contains(i))
+                        {
+                            counter++;
+                            indexY = y + yMin;
+                            indexX = x + xMin;
+                        }
+                    }
+                }
+
+                //S'il y a une seule fois un exemplaire d'un petit chiffre, le placer
+                if (counter == 1)
+                {
+                    if (sudoku.Grid[indexY, indexX].EditNumber(i))
+                    {
+                        //Sudoku terminé
+                        return SolveState.Solved;
+                    }
+                    else
+                    {
+                        RemoveSmallNumbers(indexY, indexX, sudoku.Grid[indexY, indexX].Number);
+                        state = SolveState.FoundNumber;
+                    }
+
+                    //Mise à jour de l'observateur
+                    if (observer != null)
+                    {
+                        observer.Invoke((MethodInvoker)(() =>
+                        {
+                            observer.UpdateSudoku();
+                        }));
+                    }
+                }
+            }
+
+            //Passage à la prochaine case
+            //Vérification de dépassement vertical
+            if (yMin + squareLength < length)
+            {
+                //Vérification de dépassement horizontal
+                if (xMin + squareLength < length - 1)
+                {
+                    //Résoud à partir de la case à droite
+                    nextState = TreatSquareSmallNumbers(yMin, xMin + squareLength, state);
                 }
                 //Si au bout de la ligne, changement de ligne
                 else
                 {
                     //Si dernière case, recommence au début
-                    if (line == length - 1 && column == length - 1)
+                    if (yMin + squareLength == length - 1 && xMin + squareLength == length - 1)
                     {
-                        TreatSmallNumbers(0, 0);
+                        //Si rien n'a été trouvé, ne recommence pas
+                        if (state != SolveState.Solving)
+                        {
+                            nextState = TreatSquareSmallNumbers(0, 0, SolveState.Solving);
+                        }
                     }
                     else
                     {
                         //Résoud à partir de la première case de la ligne en dessous
-                        TreatSmallNumbers(line + 1, 0);
+                        nextState = TreatSquareSmallNumbers(yMin + squareLength, 0, state);
                     }
                 }
             }
+
+            //Retour de l'état
+            switch (nextState)
+            {
+                case SolveState.FoundNumber:
+                case SolveState.Solved:
+                    return nextState;
+                default:
+                    if (state == SolveState.Solving)
+                    {
+                        return SolveState.UnableToSolve;
+                    }
+                    else
+                    {
+                        return state;
+                    }
+            }
+        }
+
+
+        private SolveState TryRandomNumber()
+        {
+            return SolveState.UnableToSolve;//TODO
         }
 
         /// <summary>
@@ -220,7 +598,6 @@ namespace SudokuGame.Solver
                 }
             }
         }
-
 
         /// <summary>
         /// Vérifie la présence d'un chiffre sur une ligne

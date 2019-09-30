@@ -4,6 +4,7 @@
 ///Description : Reporésentation d'une case de sudoku
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
@@ -39,6 +40,90 @@ namespace SudokuGame
         }
 
         /// <summary>
+        /// Chiffre affiché
+        /// </summary>
+        public byte DisplayedNumber
+        {
+            get
+            {
+                switch (labelNumber.Text)
+                {
+                    case "1":
+                        return 1;
+                    case "2":
+                        return 2;
+                    case "3":
+                        return 3;
+                    case "4":
+                        return 4;
+                    case "5":
+                        return 5;
+                    case "6":
+                        return 6;
+                    case "7":
+                        return 7;
+                    case "8":
+                        return 8;
+                    case "9":
+                        return 9;
+                    default:
+                        return 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Petits chiffres affichés
+        /// </summary>
+        public List<byte> DisplayedSmallNumbers
+        {
+            get
+            {
+                string input = labelSmallNumbers1.Text + labelSmallNumbers2.Text;
+                List<byte> numbers = new List<byte>();
+
+                //Lecture du string et récupération des chiffres
+                foreach (char caracter in input)
+                {
+                    switch (caracter)
+                    {
+                        case '1':
+                            numbers.Add(1);
+                            break;
+                        case '2':
+                            numbers.Add(2);
+                            break;
+                        case '3':
+                            numbers.Add(3);
+                            break;
+                        case '4':
+                            numbers.Add(4);
+                            break;
+                        case '5':
+                            numbers.Add(5);
+                            break;
+                        case '6':
+                            numbers.Add(6);
+                            break;
+                        case '7':
+                            numbers.Add(7);
+                            break;
+                        case '8':
+                            numbers.Add(8);
+                            break;
+                        case '9':
+                            numbers.Add(9);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                return numbers;
+            }
+        }
+
+        /// <summary>
         /// Constructeur
         /// </summary>
         /// <param name="cell"></param>
@@ -48,6 +133,19 @@ namespace SudokuGame
 
             this.cell = cell;
 
+            if (cell.Number != 0)
+            {
+                mainNumber = cell.Number.ToString();
+            }
+
+            UpdateSmallNumbersDisplay();
+        }
+
+        /// <summary>
+        /// Met à jour l'affichage de la case
+        /// </summary>
+        public void UpdateDisplay()
+        {
             if (cell.Number != 0)
             {
                 mainNumber = cell.Number.ToString();

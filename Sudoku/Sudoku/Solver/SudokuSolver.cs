@@ -4,10 +4,6 @@
 ///Description : Résolveur de sudokus
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 
@@ -32,6 +28,11 @@ namespace SudokuGame.Solver
         private Sudoku sudoku;
         private SudokuView observer;
 
+        /// <summary>
+        /// Constructeur
+        /// </summary>
+        /// <param name="sudoku"></param>
+        /// <param name="observer"></param>
         public SudokuSolver(Sudoku sudoku, SudokuView observer = null)
         {
             this.sudoku = sudoku;
@@ -91,13 +92,7 @@ namespace SudokuGame.Solver
                 sudoku.Grid[line, column].AddSmallNumber(number);
 
                 //Mise à jour de l'observateur
-                if (observer != null)
-                {
-                    observer.Invoke((MethodInvoker)(() =>
-                    {
-                        observer.UpdateSudoku();
-                    }));
-                }
+                UpdateObservers();
             }
 
             //Vérification dépassment vérical
@@ -150,6 +145,9 @@ namespace SudokuGame.Solver
                 {
                     if (sudoku.Grid[line, column].EditNumber(sudoku.Grid[line, column].SmallNumbers[0]))
                     {
+                        //Mise à jour de l'observateur
+                        UpdateObservers();
+
                         //Sudoku terminé
                         return SolveState.Solved;
                     }
@@ -161,13 +159,7 @@ namespace SudokuGame.Solver
                     }
 
                     //Mise à jour de l'observateur
-                    if (observer != null)
-                    {
-                        observer.Invoke((MethodInvoker)(() =>
-                        {
-                            observer.UpdateSudoku();
-                        }));
-                    }
+                    UpdateObservers();
                 }
             }
 
@@ -252,6 +244,9 @@ namespace SudokuGame.Solver
                 {
                     if (sudoku.Grid[line, index].EditNumber(i))
                     {
+                        //Mise à jour de l'observateur
+                        UpdateObservers();
+
                         //Sudoku terminé
                         return SolveState.Solved;
                     }
@@ -262,13 +257,7 @@ namespace SudokuGame.Solver
                     }
 
                     //Mise à jour de l'observateur
-                    if (observer != null)
-                    {
-                        observer.Invoke((MethodInvoker)(() =>
-                        {
-                            observer.UpdateSudoku();
-                        }));
-                    }
+                    UpdateObservers();
                 }
             }
 
@@ -344,6 +333,9 @@ namespace SudokuGame.Solver
                 {
                     if (sudoku.Grid[index, column].EditNumber(i))
                     {
+                        //Mise à jour de l'observateur
+                        UpdateObservers();
+
                         //Sudoku terminé
                         return SolveState.Solved;
                     }
@@ -354,13 +346,7 @@ namespace SudokuGame.Solver
                     }
 
                     //Mise à jour de l'observateur
-                    if (observer != null)
-                    {
-                        observer.Invoke((MethodInvoker)(() =>
-                        {
-                            observer.UpdateSudoku();
-                        }));
-                    }
+                    UpdateObservers();
                 }
             }
 
@@ -443,6 +429,9 @@ namespace SudokuGame.Solver
                 {
                     if (sudoku.Grid[indexY, indexX].EditNumber(i))
                     {
+                        //Mise à jour de l'observateur
+                        UpdateObservers();
+
                         //Sudoku terminé
                         return SolveState.Solved;
                     }
@@ -453,13 +442,7 @@ namespace SudokuGame.Solver
                     }
 
                     //Mise à jour de l'observateur
-                    if (observer != null)
-                    {
-                        observer.Invoke((MethodInvoker)(() =>
-                        {
-                            observer.UpdateSudoku();
-                        }));
-                    }
+                    UpdateObservers();
                 }
             }
 
@@ -670,6 +653,21 @@ namespace SudokuGame.Solver
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Mise à jour de l'observateur
+        /// </summary>
+        private void UpdateObservers()
+        {
+            //Mise à jour de l'observateur
+            if (observer != null)
+            {
+                observer.Invoke((MethodInvoker)(() =>
+                {
+                    observer.UpdateSudoku();
+                }));
+            }
         }
 
     }

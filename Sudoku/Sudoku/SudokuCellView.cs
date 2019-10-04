@@ -192,54 +192,84 @@ namespace SudokuGame
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             //Affichage de l'aide
-            if (!cell.IsFixed && Focused)
+            if (Focused)
             {
                 switch (keyData)
                 {
                     case Keys.D0 | Keys.Shift:
                     case Keys.Back:
                     case Keys.Delete:
-                        cell.EditNumber(0);
-                        mainNumber = "";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(0);
+                            mainNumber = "";
+                        }
                         break;
                     case Keys.D1 | Keys.Shift:
-                        cell.EditNumber(1);
-                        mainNumber = "1";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(1);
+                            mainNumber = "1";
+                        }
                         break;
                     case Keys.D2 | Keys.Shift:
-                        cell.EditNumber(2);
-                        mainNumber = "2";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(2);
+                            mainNumber = "2";
+                        }
                         break;
                     case Keys.D3 | Keys.Shift:
-                        cell.EditNumber(3);
-                        mainNumber = "3";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(3);
+                            mainNumber = "3";
+                        }
                         break;
                     case Keys.D4 | Keys.Shift:
-                        cell.EditNumber(4);
-                        mainNumber = "4";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(4);
+                            mainNumber = "4";
+                        }
                         break;
                     case Keys.D5 | Keys.Shift:
-                        cell.EditNumber(5);
-                        mainNumber = "5";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(5);
+                            mainNumber = "5";
+                        }
                         break;
                     case Keys.D6 | Keys.Shift:
-                        cell.EditNumber(6);
-                        mainNumber = "6";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(6);
+                            mainNumber = "6";
+                        }
                         break;
                     case Keys.D7 | Keys.Shift:
-                        cell.EditNumber(7);
-                        mainNumber = "7";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(7);
+                            mainNumber = "7";
+                        }
                         break;
                     case Keys.D8 | Keys.Shift:
-                        cell.EditNumber(8);
-                        mainNumber = "8";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(8);
+                            mainNumber = "8";
+                        }
                         break;
                     case Keys.D9 | Keys.Shift:
-                        cell.EditNumber(9);
-                        mainNumber = "9";
+                        if (!cell.IsFixed)
+                        {
+                            cell.EditNumber(9);
+                            mainNumber = "9";
+                        }
                         break;
                     case Keys.D1:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(1))
                             {
@@ -253,7 +283,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D2:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(2))
                             {
@@ -267,7 +297,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D3:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(3))
                             {
@@ -281,7 +311,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D4:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(4))
                             {
@@ -295,7 +325,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D5:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(5))
                             {
@@ -309,7 +339,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D6:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(6))
                             {
@@ -323,7 +353,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D7:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(7))
                             {
@@ -337,7 +367,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D8:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(8))
                             {
@@ -351,7 +381,7 @@ namespace SudokuGame
                         }
                         break;
                     case Keys.D9:
-                        if (cell.Number == 0)
+                        if (!cell.IsFixed && cell.Number == 0)
                         {
                             if (!cell.SmallNumbers.Contains(9))
                             {

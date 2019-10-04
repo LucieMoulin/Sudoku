@@ -143,7 +143,15 @@ namespace SudokuGame
 
         private void SolveToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            solveThread.Start();
+            if (solveThread.ThreadState == ThreadState.Unstarted)
+            {
+                solveThread.Start();
+            }
+            else
+            {
+                solveThread = new Thread(() => { solver.SolveSudoku(); });
+                solveThread.Start();
+            }
         }
 
         private void SudokuView_FormClosing(object sender, FormClosingEventArgs e)

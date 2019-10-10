@@ -4,6 +4,8 @@
 ///Description : Résolveur de sudokus
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 
@@ -39,36 +41,73 @@ namespace SudokuGame.Solver
             this.observer = observer;
         }
 
-        public bool IsSudokuValid()
-        {
-            return false;
-        }
-
+        /// <summary>
+        /// Lance la résolution du sudoku
+        /// </summary>
         public void SolveSudoku()
         {
-            RecursivePlaceSmallNumbers(0, 0, 1);
+            RecursivePlaceSmallNumbers();
 
-            RecursiveSolveSudoku();
+            BruteForceSolve();
+        }
+
+
+        private SolveState BruteForceSolve()
+        {
+            //Essai de résolution simple
+            if(RecursiveMethodicalSolveSudoku() == SolveState.Solved)
+            {
+                return SolveState.Solved;
+            }
+
+            //Sauvegarde de l'état du sudoku
+            SudokuCell[,] copy = CopySudoku();
+
+            //Essai avec un chiffre arbitraire
+            if(TryNumber() == SolveState.Solved)
+            {
+                return SolveState.Solved;
+            }
+
+            //Restauration de l'état avant l'essai
+            RestoreCopy(copy);
+        }
+
+        private SolveState TryNumber()
+        {
+            return SolveState.UnableToSolve;
+        }
+
+        private void FindBestPossibility()
+        {
+
         }
 
         /// <summary>
         /// Résoud le sudoku
         /// </summary>
         /// <returns></returns>
-        private SolveState RecursiveSolveSudoku()
+        private SolveState RecursiveMethodicalSolveSudoku()
         {
             SolveState uniqueState = TreatUniqueSmallNumbers(0, 0, SolveState.Solving);
             SolveState lineState = TreatLineSmallNumbers(0, SolveState.Solving);
             SolveState columnState = TreatColumnSmallNumbers(0, SolveState.Solving);
             SolveState squareState = TreatSquareSmallNumbers(0, 0, SolveState.Solving);
 
-            if(uniqueState == SolveState.UnableToSolve && lineState == SolveState.UnableToSolve && columnState == SolveState.UnableToSolve && squareState == SolveState.UnableToSolve)
+            //Si aucun n'a rien avancé, cet algorithme n'est pas capable de résoudre le sudoku
+            if (uniqueState == SolveState.UnableToSolve && lineState == SolveState.UnableToSolve && columnState == SolveState.UnableToSolve && squareState == SolveState.UnableToSolve)
             {
                 return SolveState.UnableToSolve;
             }
+            //Sudoku terminé
+            else if (uniqueState == SolveState.Solved || lineState == SolveState.Solved || columnState == SolveState.Solved || squareState == SolveState.Solved)
+            {
+                return SolveState.Solved;
+            }
+            //Sudoku en cours
             else
             {
-                return RecursiveSolveSudoku();
+                return RecursiveMethodicalSolveSudoku();
             }
         }
 
@@ -78,7 +117,7 @@ namespace SudokuGame.Solver
         /// <param name="line">ligne</param>
         /// <param name="column">colonne</param>
         /// <param name="number">chiffre</param>
-        private void RecursivePlaceSmallNumbers(int line, int column, byte number)
+        private void RecursivePlaceSmallNumbers(int line = 0, int column = 0, byte number = 1)
         {
             //Récupération du sommet du carré actuel
             int length = sudoku.Grid.GetLength(0);
@@ -494,12 +533,6 @@ namespace SudokuGame.Solver
             }
         }
 
-
-        private SolveState TryRandomNumber()
-        {
-            return SolveState.UnableToSolve;//TODO
-        }
-
         /// <summary>
         /// Enlève tous les petits chiffres impossibles si placé à ligne colonne
         /// </summary>
@@ -670,5 +703,63 @@ namespace SudokuGame.Solver
             }
         }
 
+        /// <summary>
+        /// Copie les chiffres du sudoku dans un tablea de bytes
+        /// </summary>
+        /// <returns></returns>
+        private SudokuCell[,] CopySudoku()
+        {
+            int length = sudoku.Grid.GetLength(0);
+            SudokuCell[,] copy = new SudokuCell[length, length];
+            for (int x = 0; x < length; x++)
+            {
+                for (int y = 0; y < length; y++)
+                {
+                    copy[x, y] = new SudokuCell(sudoku, x, y);
+                    copy[x, y].EditNumber(sudoku.Grid[x, y].Number);
+                    foreach (byte smallnumber in sudoku.Grid[x, y].SmallNumbers)
+                    {
+                        copy[x, y].AddSmallNumber(smallnumber);
+                    }
+                }
+            }
+
+            return copy;
+        }
+
+        /// <summary>
+        /// Restaure une copie du sudoku
+        /// </summary>
+        /// <param name="copy"></param>
+        private void RestoreCopy(SudokuCell[,] copy)
+        {
+            int length = sudoku.Grid.GetLength(0);
+            for (int x = 0; x < length; x++)
+            {
+                for (int y = 0; y < length; y++)
+                {
+                    if (copy[x, y].Number != sudoku.Grid[x, y].Number)
+                    {
+                        sudoku.Grid[x, y].EditNumber(copy[x, y].Number);
+                    }
+
+                    //Retire et restaure les petits chiffres
+                    byte[] numbers = new byte[sudoku.Grid[x, y].SmallNumbers.Count];
+                    sudoku.Grid[x, y].SmallNumbers.CopyTo(numbers);
+
+                    foreach (byte number in numbers)
+                    {
+                        sudoku.Grid[x, y].RemoveSmallNumber(number);
+                    }
+
+                    foreach (byte smallNumber in copy[x, y].SmallNumbers)
+                    {
+                        sudoku.Grid[x, y].AddSmallNumber(smallNumber);
+                    }
+                }
+            }
+
+            UpdateObservers();
+        }
     }
 }

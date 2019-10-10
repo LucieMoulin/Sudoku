@@ -146,6 +146,8 @@ namespace SudokuGame
         /// </summary>
         public void UpdateDisplay()
         {
+            mainNumber = "";
+
             if (cell.Number != 0)
             {
                 mainNumber = cell.Number.ToString();

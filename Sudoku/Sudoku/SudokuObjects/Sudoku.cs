@@ -15,6 +15,7 @@ namespace SudokuGame.SudokuObjects
     {
         private SudokuCell[,] grid;
         private SudokuType type;
+        private int length;
 
         /// <summary>
         /// Grille
@@ -25,6 +26,8 @@ namespace SudokuGame.SudokuObjects
         /// Type de sudoku
         /// </summary>
         public SudokuType Type { get => type; }
+
+        public int Length { get => length; }
 
         /// <summary>
         /// Constructeur
@@ -44,6 +47,8 @@ namespace SudokuGame.SudokuObjects
                     InitGrid(4);
                     break;
             }
+
+            length = Grid.GetLength(0);
         }
 
         /// <summary>
@@ -160,7 +165,7 @@ namespace SudokuGame.SudokuObjects
 
             return usedNumbers.Count == grid.GetLength(0);
         }
-        
+
         /// <summary>
         /// Vérifications des carrés
         /// </summary>
@@ -170,7 +175,7 @@ namespace SudokuGame.SudokuObjects
             bool areOk = true;
 
             //Parcours de tous les carrés
-            for(int y = 0; y < grid.GetLength(0); y += (int)Math.Sqrt(grid.GetLength(0)))
+            for (int y = 0; y < grid.GetLength(0); y += (int)Math.Sqrt(grid.GetLength(0)))
             {
                 for (int x = 0; x < grid.GetLength(0); x += (int)Math.Sqrt(grid.GetLength(0)))
                 {

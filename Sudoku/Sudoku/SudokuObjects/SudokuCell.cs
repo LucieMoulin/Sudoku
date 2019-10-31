@@ -75,14 +75,12 @@ namespace SudokuGame.SudokuObjects
         /// </summary>
         /// <param name="number"></param>
         /// <returns>Sudoku terminé</returns>
-        public bool EditNumber(byte number)
+        public void EditNumber(byte number)
         {            
             if (!isFixed && number <= maxNumber)
             {
                 this.number = number;
-                return parent.IsCompleted();
             }
-            return false;
         }
 
         /// <summary>

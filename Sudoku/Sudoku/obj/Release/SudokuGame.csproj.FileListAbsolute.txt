@@ -1,0 +1,10 @@
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\bin\Release\SudokuGame.exe.config
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\bin\Release\SudokuGame.exe
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\bin\Release\SudokuGame.pdb
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.Properties.Resources.resources
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.SudokuCellView.resources
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.SudokuView.resources
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.csproj.GenerateResource.cache
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.csproj.CoreCompileInputs.cache
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.exe
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Release\SudokuGame.pdb

@@ -24,10 +24,6 @@ namespace SudokuGame
                 labelNumber.Text = value;
                 if (value != "")
                 {
-                    if (Parent != null)
-                    {
-                        ((SudokuView)Parent).CheckVictory();
-                    }
                     labelSmallNumbers1.Visible = false;
                     labelSmallNumbers2.Visible = false;
                 }
@@ -212,6 +208,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(1);
                             mainNumber = "1";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D2 | Keys.Shift:
@@ -219,6 +220,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(2);
                             mainNumber = "2";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D3 | Keys.Shift:
@@ -226,6 +232,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(3);
                             mainNumber = "3";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D4 | Keys.Shift:
@@ -233,6 +244,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(4);
                             mainNumber = "4";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D5 | Keys.Shift:
@@ -240,6 +256,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(5);
                             mainNumber = "5";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D6 | Keys.Shift:
@@ -247,6 +268,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(6);
                             mainNumber = "6";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D7 | Keys.Shift:
@@ -254,6 +280,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(7);
                             mainNumber = "7";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D8 | Keys.Shift:
@@ -261,6 +292,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(8);
                             mainNumber = "8";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D9 | Keys.Shift:
@@ -268,6 +304,11 @@ namespace SudokuGame
                         {
                             cell.EditNumber(9);
                             mainNumber = "9";
+
+                            if (Parent != null)
+                            {
+                                ((SudokuView)Parent).CheckVictory();
+                            }
                         }
                         break;
                     case Keys.D1:

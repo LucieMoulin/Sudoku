@@ -36,8 +36,8 @@ namespace SudokuGame.Generator
             sudoku.Grid[2, 6].EditNumber(2);
             sudoku.Grid[2, 6].IsFixed = true;
 
-            sudoku.Grid[3, 2].EditNumber(5);
-            sudoku.Grid[3, 2].IsFixed = true;
+            sudoku.Grid[3, 1].EditNumber(5);
+            sudoku.Grid[3, 1].IsFixed = true;
 
             sudoku.Grid[3, 5].EditNumber(7);
             sudoku.Grid[3, 5].IsFixed = true;

@@ -14,8 +14,7 @@ namespace SudokuGame.SudokuObjects
     public class Sudoku
     {
         private SudokuCell[,] grid;
-        private SudokuType type;
-        private int length;
+        private const int SIZE = 9;
 
         /// <summary>
         /// Grille
@@ -23,44 +22,28 @@ namespace SudokuGame.SudokuObjects
         public SudokuCell[,] Grid { get => grid; set => grid = value; }
 
         /// <summary>
-        /// Type de sudoku
+        /// Taille du sudoku
         /// </summary>
-        public SudokuType Type { get => type; }
-
-        public int Length { get => length; }
+        public int Length { get => SIZE; }
 
         /// <summary>
         /// Constructeur
         /// </summary>
-        /// <param name="type">Type de sudoku</param>
-        public Sudoku(SudokuType type = SudokuType.Numeric9)
+        public Sudoku()
         {
-            this.type = type;
-            switch (type)
-            {
-                default:
-                case SudokuType.Numeric9:
-                    InitGrid(9);
-                    break;
-
-                case SudokuType.Numeric4:
-                    InitGrid(4);
-                    break;
-            }
-
-            length = Grid.GetLength(0);
+            InitGrid();
         }
 
         /// <summary>
         /// Initialise la grille du sudoku
         /// </summary>
-        private void InitGrid(int size)
+        private void InitGrid()
         {
-            grid = new SudokuCell[size, size];
+            grid = new SudokuCell[SIZE, SIZE];
 
-            for (int y = 0; y < size; y++)
+            for (int y = 0; y < SIZE; y++)
             {
-                for (int x = 0; x < size; x++)
+                for (int x = 0; x < SIZE; x++)
                 {
                     //Initialisation de chaque cellule
                     grid[y, x] = new SudokuCell(this, x, y);
@@ -75,9 +58,7 @@ namespace SudokuGame.SudokuObjects
         /// <param name="fileName"></param>
         public void Load(string fileName)
         {
-            Sudoku newSudoku = SudokuSaver.Load(fileName);
-            grid = newSudoku.grid;
-            type = newSudoku.type;
+            grid = SudokuSaver.Load(fileName);
         }
 
         /// <summary>

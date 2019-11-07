@@ -29,6 +29,11 @@ namespace SudokuGame.Solver
         private SudokuView observer;
 
         /// <summary>
+        /// Profondeur maximale du bruteforce (plus grand, plus lent, mais résoud des sudokus plus compliqués)
+        /// </summary>
+        private const int MAXIMUM_BRUTEFORCE_DEPTH = 5;
+
+        /// <summary>
         /// Constructeur
         /// </summary>
         /// <param name="sudoku"></param>
@@ -42,21 +47,18 @@ namespace SudokuGame.Solver
         /// <summary>
         /// Lance la résolution du sudoku
         /// </summary>
-        public void SolveSudoku()
+        public bool SolveSudoku()
         {
             PlaceSmallNumbers();
 
-            BruteForceSolve();
+            return BruteForceSolve() == SolveState.Solved;
         }
 
         /// <summary>
         /// Résoud le sudoku en ajoutant des chiffres quand il est bloqué (Peut être lent)
         /// </summary>
-        /// <param name="line"></param>
-        /// <param name="column"></param>
-        /// <param name="index"></param>
         /// <returns></returns>
-        private SolveState BruteForceSolve(int line = 0, int column = 0, byte index = 0)
+        private SolveState BruteForceSolve(int counter = 0)
         {
             //Essaie de résoudre
             if (RecursiveMethodicalSolveSudoku() == SolveState.Solved)
@@ -64,59 +66,41 @@ namespace SudokuGame.Solver
                 return SolveState.Solved;
             }
 
-            SudokuCell cell = sudoku.Grid[line, column];
-
-            //Essaie le chiffre si possible
-            if (!cell.IsFixed && cell.SmallNumbers.Count > 0 && cell.Number == 0)
+            //Essaie pour chaque case chaque possibilité
+            foreach (SudokuCell cell in sudoku.Grid)
             {
-                //Sauvegarde le sudoku
-                SudokuCell[,] copy = CopySudoku();
-
-                //Place le chiffre
-                cell.EditNumber(sudoku.Grid[line, column].SmallNumbers[index]);
-
-                //Replace les petits chiffres
-                RemoveAllSmallNumbers();
-                PlaceSmallNumbers();
-
-                //Essai de résolution simple
-                if (BruteForceSolve() == SolveState.Solved)
+                //Si la case est testable
+                if (counter < MAXIMUM_BRUTEFORCE_DEPTH && !cell.IsFixed && cell.SmallNumbers.Count == 2 && cell.Number == 0)
                 {
-                    return SolveState.Solved;
-                }
+                    //Essaie chaque chiffre
+                    for (int index = 0; index < cell.SmallNumbers.Count; index++)
+                    {
+                        //Sauvegarde le sudoku
+                        SudokuCell[,] copy = CopySudoku();
 
-                //Enlève le chiffre
-                cell.EditNumber(0);
+                        //Place le chiffre
+                        cell.EditNumber(cell.SmallNumbers[index]);
 
-                //Restaure la copie
-                RestoreCopy(copy);
+                        //Replace les petits chiffres
+                        RemoveAllSmallNumbers();
+                        PlaceSmallNumbers();
 
-                //Passe au chiffre suivant
-                if (index < cell.SmallNumbers.Count - 1)
-                {
-                    return BruteForceSolve(line, column, ++index);
-                }
+                        //Essai de résolution simple
+                        if (BruteForceSolve(counter + 1) == SolveState.Solved)
+                        {
+                            return SolveState.Solved;
+                        }
+
+                        //Enlève le chiffre
+                        cell.EditNumber(0);
+
+                        //Restaure la copie
+                        RestoreCopy(copy);
+                    }                    
+                }                
             }
 
-            //Passage à la case suivante
-            //Passage à la case à droite
-            if (column < sudoku.Length - 1)
-            {
-                return BruteForceSolve(line, ++column, 0);
-            }
-            else
-            {
-                //Passage à la prochaine ligne
-                if (line < sudoku.Length - 1)
-                {
-                    return BruteForceSolve(++line, 0, 0);
-                }
-                //Toutes les cases ont été testées
-                else
-                {
-                    return SolveState.UnableToSolve;
-                }
-            }
+            return SolveState.UnableToSolve;
         }
 
         /// <summary>

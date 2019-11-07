@@ -30,7 +30,12 @@
         {
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.fichierToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.solveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.newSudokuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -47,9 +52,27 @@
             // 
             // fichierToolStripMenuItem
             // 
+            this.fichierToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newSudokuToolStripMenuItem,
+            this.openToolStripMenuItem,
+            this.saveToolStripMenuItem});
             this.fichierToolStripMenuItem.Name = "fichierToolStripMenuItem";
             this.fichierToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
             this.fichierToolStripMenuItem.Text = "Fichier";
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Text = "Ouvrir";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Text = "Enregistrer";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
             // 
             // solveToolStripMenuItem
             // 
@@ -57,6 +80,24 @@
             this.solveToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
             this.solveToolStripMenuItem.Text = "Résoudre";
             this.solveToolStripMenuItem.Click += new System.EventHandler(this.SolveToolStripMenuItem_Click);
+            // 
+            // openFileDialog
+            // 
+            this.openFileDialog.DefaultExt = "sudoku";
+            this.openFileDialog.Filter = "Sudokus|*.sudoku";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "sudoku";
+            this.saveFileDialog.FileName = "MySudoku.sudoku";
+            this.saveFileDialog.Filter = "Sudokus|*.sudoku";
+            // 
+            // newSudokuToolStripMenuItem
+            // 
+            this.newSudokuToolStripMenuItem.Name = "newSudokuToolStripMenuItem";
+            this.newSudokuToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newSudokuToolStripMenuItem.Text = "Nouveau Sudoku";
+            this.newSudokuToolStripMenuItem.Click += new System.EventHandler(this.NewSudokuToolStripMenuItem_Click);
             // 
             // SudokuView
             // 
@@ -84,6 +125,11 @@
         private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem fichierToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem solveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem newSudokuToolStripMenuItem;
     }
 }
 

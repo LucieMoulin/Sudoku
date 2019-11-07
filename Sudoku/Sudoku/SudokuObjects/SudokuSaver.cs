@@ -3,10 +3,9 @@
 ///Date : 05.09.2019
 ///Description : Sauvegardeur de partie
 
+using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace SudokuGame.SudokuObjects
 {
@@ -20,30 +19,22 @@ namespace SudokuGame.SudokuObjects
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static Sudoku Load(string fileName)
+        public static SudokuCell[,] Load(string fileName)
         {
-            Sudoku sudokuOut = default(Sudoku);
+            TextReader reader = null;
 
             try
             {
-                XmlDocument document = new XmlDocument();
-                document.Load(fileName);
-                string xmlString = document.OuterXml;
-
-                using (StringReader read = new StringReader(xmlString))
-                {
-                    Type outType = typeof(Sudoku);
-
-                    XmlSerializer serializer = new XmlSerializer(outType);
-                    using (XmlReader reader = new XmlTextReader(read))
-                    {
-                        sudokuOut = (Sudoku)serializer.Deserialize(reader);
-                    }
-                }
+                reader = new StreamReader(fileName);
+                string fileContents = reader.ReadToEnd();
+                SudokuCell[,] grid = JsonConvert.DeserializeObject<SudokuCell[,]>(fileContents);
+                return grid;
             }
-            catch { }
-
-            return sudokuOut;
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+            }
         }
 
         /// <summary>
@@ -54,22 +45,22 @@ namespace SudokuGame.SudokuObjects
         /// <returns>sauvegarde réussie</returns>
         public static bool Save(string fileName, Sudoku sudoku)
         {
+            TextWriter writer = null;
             try
             {
-                XmlDocument document = new XmlDocument();
-                XmlSerializer serializer = new XmlSerializer(sudoku.GetType());
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    serializer.Serialize(stream, sudoku);
-                    stream.Position = 0;
-                    document.Load(stream);
-                    document.Save(fileName);
-                }
+                string contentsToWriteToFile = JsonConvert.SerializeObject(sudoku.Grid);
+                writer = new StreamWriter(fileName);
+                writer.Write(contentsToWriteToFile);
                 return true;
             }
             catch
             {
                 return false;
+            }
+            finally
+            {
+                if (writer != null)
+                    writer.Close();
             }
         }
     }

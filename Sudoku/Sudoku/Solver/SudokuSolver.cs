@@ -29,6 +29,11 @@ namespace SudokuGame.Solver
         private SudokuView observer;
 
         /// <summary>
+        /// Définis si les observateurs sont mis à jour en temps réel
+        /// </summary>
+        private const bool DISPLAY_REAL_TIME = true;
+
+        /// <summary>
         /// Profondeur maximale du bruteforce (plus grand, plus lent, mais résoud des sudokus plus compliqués)
         /// </summary>
         private const int MAXIMUM_BRUTEFORCE_DEPTH = 5;
@@ -50,6 +55,12 @@ namespace SudokuGame.Solver
         public bool SolveSudoku()
         {
             PlaceSmallNumbers();
+
+            //Mise à jour de l'observateur
+            if (DISPLAY_REAL_TIME)
+            {
+                UpdateObservers();
+            }
 
             return BruteForceSolve() == SolveState.Solved;
         }
@@ -81,6 +92,12 @@ namespace SudokuGame.Solver
                         //Place le chiffre
                         cell.EditNumber(cell.SmallNumbers[index]);
 
+                        //Mise à jour de l'observateur
+                        if (DISPLAY_REAL_TIME)
+                        {
+                            UpdateObservers();
+                        }
+
                         //Replace les petits chiffres
                         RemoveAllSmallNumbers();
                         PlaceSmallNumbers();
@@ -96,8 +113,14 @@ namespace SudokuGame.Solver
 
                         //Restaure la copie
                         RestoreCopy(copy);
-                    }                    
-                }                
+
+                        //Mise à jour de l'observateur
+                        if (DISPLAY_REAL_TIME)
+                        {
+                            UpdateObservers();
+                        }
+                    }
+                }
             }
 
             return SolveState.UnableToSolve;
@@ -208,6 +231,12 @@ namespace SudokuGame.Solver
                     {
                         RemoveSmallNumbers(line, column, cell.Number);
 
+                        //Mise à jour de l'observateur
+                        if (DISPLAY_REAL_TIME)
+                        {
+                            UpdateObservers();
+                        }
+
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -303,7 +332,15 @@ namespace SudokuGame.Solver
                     }
                     else
                     {
+                        //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(line, index, sudoku.Grid[line, index].Number);
+                        
+                        //Mise à jour de l'observateur
+                        if (DISPLAY_REAL_TIME)
+                        {
+                            UpdateObservers();
+                        }
+
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -389,7 +426,15 @@ namespace SudokuGame.Solver
                     }
                     else
                     {
+                        //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(index, column, sudoku.Grid[index, column].Number);
+
+                        //Mise à jour de l'observateur
+                        if (DISPLAY_REAL_TIME)
+                        {
+                            UpdateObservers();
+                        }
+
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -484,7 +529,15 @@ namespace SudokuGame.Solver
                     }
                     else
                     {
+                        //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(indexY, indexX, sudoku.Grid[indexY, indexX].Number);
+
+                        //Mise à jour de l'observateur
+                        if (DISPLAY_REAL_TIME)
+                        {
+                            UpdateObservers();
+                        }
+
                         state = SolveState.FoundNumber;
                     }
                 }

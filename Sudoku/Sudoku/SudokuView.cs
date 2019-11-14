@@ -127,6 +127,11 @@ namespace SudokuGame
             }
         }
 
+        /// <summary>
+        /// Événement de click du menu "Résoudre"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SolveToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             if (solveThread.ThreadState == ThreadState.Unstarted)
@@ -140,11 +145,24 @@ namespace SudokuGame
             }
         }
 
+        /// <summary>
+        /// Événement de fermeture de la fenêtre
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SudokuView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            solveThread.Abort();
+            if (solveThread.IsAlive)
+            {
+                solveThread.Abort();
+            }
         }
 
+        /// <summary>
+        /// Événement de click du menu "Ouvrir"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OpenToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             DialogResult result = openFileDialog.ShowDialog();
@@ -156,6 +174,11 @@ namespace SudokuGame
             }
         }
 
+        /// <summary>
+        /// Événement de click du menu "Sauvegarder"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SaveToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             DialogResult result = saveFileDialog.ShowDialog();
@@ -166,6 +189,11 @@ namespace SudokuGame
             }
         }
 
+        /// <summary>
+        /// Événement de click du menu "Nouveau Sudoku"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NewSudokuToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             sudoku = generator.NewRandomSudoku();

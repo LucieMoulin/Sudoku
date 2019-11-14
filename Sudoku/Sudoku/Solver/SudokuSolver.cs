@@ -4,6 +4,8 @@
 ///Description : Résolveur de sudokus
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 
@@ -31,7 +33,7 @@ namespace SudokuGame.Solver
         /// <summary>
         /// Définis si les observateurs sont mis à jour en temps réel
         /// </summary>
-        private const bool DISPLAY_REAL_TIME = true;
+        private const bool DISPLAY_REAL_TIME = false;
 
         /// <summary>
         /// Profondeur maximale du bruteforce (plus grand, plus lent, mais résoud des sudokus plus compliqués)
@@ -69,7 +71,7 @@ namespace SudokuGame.Solver
         /// Résoud le sudoku en ajoutant des chiffres quand il est bloqué (Peut être lent)
         /// </summary>
         /// <returns></returns>
-        private SolveState BruteForceSolve(int counter = 0)
+        private SolveState BruteForceSolve(int counter = 0, bool ignoreLimit = false)
         {
             //Essaie de résoudre
             if (RecursiveMethodicalSolveSudoku() == SolveState.Solved)
@@ -77,11 +79,29 @@ namespace SudokuGame.Solver
                 return SolveState.Solved;
             }
 
-            //Essaie pour chaque case chaque possibilité
+            //Sélectionne les cases et les ordonne par nombre de petits chiffres
+            List<SudokuCell> selectedCells = new List<SudokuCell>();
+            int minimumSmallNumbersCount = sudoku.Length;
             foreach (SudokuCell cell in sudoku.Grid)
             {
+                if(!cell.IsFixed && cell.Number == 0 && cell.SmallNumbers.Count < minimumSmallNumbersCount)
+                {
+                    minimumSmallNumbersCount = cell.SmallNumbers.Count;
+                }
+            }
+            foreach (SudokuCell cell in sudoku.Grid)
+            {
+                if(cell.SmallNumbers.Count == minimumSmallNumbersCount && !cell.IsFixed && cell.Number == 0)
+                {
+                    selectedCells.Add(cell);
+                }
+            }
+            
+            //Essaie pour chaque case chaque possibilité
+            foreach (SudokuCell cell in selectedCells)
+            {
                 //Si la case est testable
-                if (counter < MAXIMUM_BRUTEFORCE_DEPTH && !cell.IsFixed && cell.SmallNumbers.Count == 2 && cell.Number == 0)
+                if (counter < MAXIMUM_BRUTEFORCE_DEPTH && !cell.IsFixed && cell.Number == 0)
                 {
                     //Essaie chaque chiffre
                     for (int index = 0; index < cell.SmallNumbers.Count; index++)
@@ -103,7 +123,7 @@ namespace SudokuGame.Solver
                         PlaceSmallNumbers();
 
                         //Essai de résolution simple
-                        if (BruteForceSolve(counter + 1) == SolveState.Solved)
+                        if (BruteForceSolve(counter + (ignoreLimit ? 0 : 1), ignoreLimit) == SolveState.Solved)
                         {
                             return SolveState.Solved;
                         }
@@ -155,6 +175,42 @@ namespace SudokuGame.Solver
         }
 
         /// <summary>
+        /// Regarde si un sudoku est résolvable (sans bruteforce)
+        /// </summary>
+        /// <returns></returns>
+        public bool IsSudokuSolvable()
+        {
+            bool result = false;
+
+            SudokuCell[,] sudoku = CopySudoku();
+
+            result = RecursiveMethodicalSolveSudoku() == SolveState.Solved;
+
+            RestoreCopy(sudoku);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Regarde si un sudoku est résolvable (sans bruteforce)
+        /// </summary>
+        /// <returns></returns>
+        public bool IsSudokuSolvableWithBruteForce()
+        {
+            bool result = false;
+
+            SudokuCell[,] sudoku = CopySudoku();
+
+            PlaceSmallNumbers();
+
+            result = BruteForceSolve(0, true) == SolveState.Solved;
+
+            RestoreCopy(sudoku);
+
+            return result;
+        }
+
+        /// <summary>
         /// Parcours le sudoku et place les petits chiffres aux endroits possibles
         /// </summary>
         private void PlaceSmallNumbers()
@@ -163,7 +219,7 @@ namespace SudokuGame.Solver
 
             foreach (SudokuCell cell in sudoku.Grid)
             {
-                if (!cell.IsFixed)
+                if (!cell.IsFixed && cell.Number == 0)
                 {
                     int column = cell.X;
                     int line = cell.Y;

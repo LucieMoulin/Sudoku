@@ -102,5 +102,14 @@ namespace SudokuGame.SudokuObjects
                 smallNumbers.Remove(number);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return number.ToString();
+        }
     }
 }

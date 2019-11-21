@@ -7,6 +7,8 @@ using SudokuGame.Solver;
 using SudokuGame.SudokuObjects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 
 namespace SudokuGame.Generator
 {
@@ -17,6 +19,7 @@ namespace SudokuGame.Generator
     {
         private Random random;
         private SudokuSolver solver;
+        private const int MAX_GENERATION_TIME = 500;
 
         /// <summary>
         /// Constructeur
@@ -36,7 +39,12 @@ namespace SudokuGame.Generator
 
             solver = new SudokuSolver(sudoku);
 
-            FillWithRandomNumbers(sudoku);
+            while (!FillWithRandomNumbers(sudoku)){
+                sudoku = new Sudoku();
+                solver = new SudokuSolver(sudoku);
+            }
+
+
             /*
             int lastX = 0, lastY = 0;
             byte lastNumber = 0;
@@ -57,7 +65,7 @@ namespace SudokuGame.Generator
         /// Remplis le sudoku (vide) avec des chiffres aléatoire
         /// </summary>
         /// <param name="sudoku"></param>
-        public void FillWithRandomNumbers(Sudoku sudoku)
+        public bool FillWithRandomNumbers(Sudoku sudoku)
         {
             //Cases à remplir
             List<SudokuCell> emptyCells = new List<SudokuCell>();
@@ -69,7 +77,75 @@ namespace SudokuGame.Generator
                 }
             }
 
-            RecursivePlaceRandomNumber(emptyCells, sudoku);
+            //Remplissage de la première ligne et de la première colonne aléatoirement (accélère la suite)
+            for(int index = 0; index < sudoku.Length; index++)
+            {
+                SudokuCell lineCell = sudoku.Grid[0, index];
+                SudokuCell columnCell = sudoku.Grid[index, 0];
+
+                //Ajout d'un chiffre aléatoire
+                if (lineCell.Number == 0)
+                {
+                    //Récupération des possibilités
+                    List<byte> possibilities = GetPossibleNumbersForCell(lineCell, sudoku);
+                    
+                    //Placement d'un chiffre pour la ligne
+                    if (possibilities.Count > 0)
+                    {
+                        byte currentNumber = possibilities[random.Next(possibilities.Count)];
+
+                        lineCell.EditNumber(currentNumber);
+
+                        emptyCells.Remove(lineCell);
+                    }
+                }
+                if (columnCell.Number == 0)
+                {
+                    //Récupération des possibilités
+                    List<byte> possibilities = GetPossibleNumbersForCell(columnCell, sudoku);
+
+                    //Placement d'un chiffre pour la ligne
+                    if (possibilities.Count > 0)
+                    {
+                        byte currentNumber = possibilities[random.Next(possibilities.Count)];
+
+                        columnCell.EditNumber(currentNumber);
+
+                        emptyCells.Remove(columnCell);
+                    }
+                }
+            }
+
+            //Chronomètre
+            Stopwatch stopwatch = new Stopwatch();
+
+            //Ajout aléatoire des chiffres dans la grille
+            Thread generationThread = new Thread(() => {
+                RecursivePlaceRandomNumber(emptyCells, sudoku);
+            });
+
+            stopwatch.Start();
+            generationThread.Start();
+
+            //Limite de temps de clacul
+            while (generationThread.IsAlive && stopwatch.ElapsedMilliseconds < MAX_GENERATION_TIME) ;
+
+            stopwatch.Stop();
+
+            //Si le temps a été dépassé mais que le thread tourne toujours, il n'a pas eu le temps de terminer
+            if (generationThread.IsAlive)
+            {
+                //Arrêt du thread
+                while (generationThread.IsAlive)
+                {
+                    generationThread.Abort();
+                }
+
+                //Retour du résultat
+                return false;            
+            }
+
+            return sudoku.IsCompleted();
         }
 
 

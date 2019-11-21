@@ -9,6 +9,6 @@ F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Debug\SudokuGame.exe
 F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Debug\SudokuGame.pdb
 F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\bin\Debug\Newtonsoft.Json.dll
 F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\bin\Debug\Newtonsoft.Json.xml
-F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Debug\SudokuGame.csprojAssemblyReference.cache
 F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Debug\SudokuGame.csproj.CoreCompileInputs.cache
+F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Debug\SudokuGame.csprojAssemblyReference.cache
 F:\P_3e\Dev\Sudoku\Sudoku\Sudoku\obj\Debug\SudokuGame.csproj.CopyComplete

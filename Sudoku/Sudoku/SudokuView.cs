@@ -22,6 +22,7 @@ namespace SudokuGame
         private SudokuGenerator generator;
         private SudokuSolver solver;
         private Thread solveThread;
+        private Thread generationThread;
 
         /// <summary>
         /// Grille de cellules
@@ -37,9 +38,7 @@ namespace SudokuGame
 
             generator = new SudokuGenerator();
             sudoku = generator.NewRandomSudoku();
-            solver = new SudokuSolver(sudoku, this);
-            solveThread = new Thread(() => { solver.SolveSudoku(); });
-
+            solver = new SudokuSolver(sudoku);
 
             cellGrid = new SudokuCellView[sudoku.Length, sudoku.Length];
 
@@ -134,15 +133,30 @@ namespace SudokuGame
         /// <param name="e"></param>
         private void SolveToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            if (solveThread.ThreadState == ThreadState.Unstarted)
+            if (solveThread is null ||solveThread.ThreadState != ThreadState.Unstarted)
             {
-                solveThread.Start();
+                solveThread = new Thread(() =>
+                {
+                    solver = new SudokuSolver(sudoku);
+                    solver.SolveSudoku();
+                });
             }
-            else
+
+            solveThread.Start();
+
+            foreach (Control control in Controls)
             {
-                solveThread = new Thread(() => { if (!solver.SolveSudoku()) MessageBox.Show("Unable"); });
-                solveThread.Start();
+                control.Enabled = false;
             }
+
+            while (solveThread.IsAlive) ;
+
+            foreach (Control control in Controls)
+            {
+                control.Enabled = true;
+            }
+
+            UpdateSudoku();
         }
 
         /// <summary>
@@ -196,7 +210,23 @@ namespace SudokuGame
         /// <param name="e"></param>
         private void NewSudokuToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            sudoku = generator.NewRandomSudoku();
+            if(generationThread is null || generationThread.ThreadState != ThreadState.Unstarted)
+            {
+                generationThread = new Thread(() =>
+                {
+                    sudoku = generator.NewRandomSudoku();
+                });
+            }
+
+            generationThread.Start();
+
+            foreach (Control control in Controls)
+            {
+                control.Enabled = false;
+            }
+
+            while (generationThread.IsAlive) ;
+
             DisplaySudoku();
         }
     }

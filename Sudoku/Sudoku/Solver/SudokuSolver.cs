@@ -27,12 +27,6 @@ namespace SudokuGame.Solver
         }
 
         private Sudoku sudoku;
-        private SudokuView observer;
-
-        /// <summary>
-        /// Définis si les observateurs sont mis à jour en temps réel
-        /// </summary>
-        private const bool DISPLAY_REAL_TIME = false;
 
         /// <summary>
         /// Profondeur maximale du bruteforce (plus grand, plus lent, mais résoud des sudokus plus compliqués)
@@ -43,11 +37,9 @@ namespace SudokuGame.Solver
         /// Constructeur
         /// </summary>
         /// <param name="sudoku"></param>
-        /// <param name="observer"></param>
-        public SudokuSolver(Sudoku sudoku, SudokuView observer = null)
+        public SudokuSolver(Sudoku sudoku)
         {
             this.sudoku = sudoku;
-            this.observer = observer;
         }
 
         /// <summary>
@@ -56,12 +48,6 @@ namespace SudokuGame.Solver
         public bool SolveSudoku()
         {
             PlaceSmallNumbers();
-
-            //Mise à jour de l'observateur
-            if (DISPLAY_REAL_TIME)
-            {
-                UpdateObservers();
-            }
 
             return BruteForceSolve() == SolveState.Solved;
         }
@@ -111,12 +97,6 @@ namespace SudokuGame.Solver
                         //Place le chiffre
                         cell.EditNumber(cell.SmallNumbers[index]);
 
-                        //Mise à jour de l'observateur
-                        if (DISPLAY_REAL_TIME)
-                        {
-                            UpdateObservers();
-                        }
-
                         //Replace les petits chiffres
                         RemoveAllSmallNumbers();
                         PlaceSmallNumbers();
@@ -132,12 +112,6 @@ namespace SudokuGame.Solver
 
                         //Restaure la copie
                         RestoreCopy(copy);
-
-                        //Mise à jour de l'observateur
-                        if (DISPLAY_REAL_TIME)
-                        {
-                            UpdateObservers();
-                        }
                     }
                 }
             }
@@ -278,8 +252,6 @@ namespace SudokuGame.Solver
                         cell.EditNumber(cell.SmallNumbers[0]);
                         if (sudoku.IsCompleted())
                         {
-                            //Mise à jour de l'observateur
-                            UpdateObservers();
 
                             //Sudoku terminé
                             return SolveState.Solved;
@@ -287,12 +259,6 @@ namespace SudokuGame.Solver
                         else
                         {
                             RemoveSmallNumbers(cell.Y, cell.X, cell.Number);
-
-                            //Mise à jour de l'observateur
-                            if (DISPLAY_REAL_TIME)
-                            {
-                                UpdateObservers();
-                            }
 
                             cellState = SolveState.FoundNumber;
                         }
@@ -355,8 +321,6 @@ namespace SudokuGame.Solver
                     sudoku.Grid[line, index].EditNumber(i);
                     if (sudoku.IsCompleted())
                     {
-                        //Mise à jour de l'observateur
-                        UpdateObservers();
 
                         //Sudoku terminé
                         return SolveState.Solved;
@@ -365,13 +329,7 @@ namespace SudokuGame.Solver
                     {
                         //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(line, index, sudoku.Grid[line, index].Number);
-
-                        //Mise à jour de l'observateur
-                        if (DISPLAY_REAL_TIME)
-                        {
-                            UpdateObservers();
-                        }
-
+                        
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -449,8 +407,6 @@ namespace SudokuGame.Solver
                     sudoku.Grid[index, column].EditNumber(i);
                     if (sudoku.IsCompleted())
                     {
-                        //Mise à jour de l'observateur
-                        UpdateObservers();
 
                         //Sudoku terminé
                         return SolveState.Solved;
@@ -459,13 +415,7 @@ namespace SudokuGame.Solver
                     {
                         //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(index, column, sudoku.Grid[index, column].Number);
-
-                        //Mise à jour de l'observateur
-                        if (DISPLAY_REAL_TIME)
-                        {
-                            UpdateObservers();
-                        }
-
+                    
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -552,9 +502,6 @@ namespace SudokuGame.Solver
                     sudoku.Grid[indexY, indexX].EditNumber(i);
                     if (sudoku.IsCompleted())
                     {
-                        //Mise à jour de l'observateur
-                        UpdateObservers();
-
                         //Sudoku terminé
                         return SolveState.Solved;
                     }
@@ -562,13 +509,6 @@ namespace SudokuGame.Solver
                     {
                         //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(indexY, indexX, sudoku.Grid[indexY, indexX].Number);
-
-                        //Mise à jour de l'observateur
-                        if (DISPLAY_REAL_TIME)
-                        {
-                            UpdateObservers();
-                        }
-
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -772,21 +712,6 @@ namespace SudokuGame.Solver
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Mise à jour de l'observateur
-        /// </summary>
-        private void UpdateObservers()
-        {
-            //Mise à jour de l'observateur
-            if (observer != null)
-            {
-                observer.Invoke((MethodInvoker)(() =>
-                {
-                    observer.UpdateSudoku();
-                }));
-            }
         }
 
         /// <summary>

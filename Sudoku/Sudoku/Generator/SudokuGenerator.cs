@@ -20,7 +20,7 @@ namespace SudokuGame.Generator
         private Random random;
         private SudokuSolver solver;
         private const int MAX_GENERATION_TIME = 500;
-        private const int MAXIMUM_FULL_CELLS_IN_SUDOKU = 25;
+        private const int MAXIMUM_FULL_CELLS_IN_SUDOKU = 27;
 
         /// <summary>
         /// Constructeur

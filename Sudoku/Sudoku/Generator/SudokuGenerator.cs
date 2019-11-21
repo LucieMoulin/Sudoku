@@ -20,6 +20,7 @@ namespace SudokuGame.Generator
         private Random random;
         private SudokuSolver solver;
         private const int MAX_GENERATION_TIME = 500;
+        private const int MAXIMUM_FULL_CELLS_IN_SUDOKU = 25;
 
         /// <summary>
         /// Constructeur
@@ -39,25 +40,60 @@ namespace SudokuGame.Generator
 
             solver = new SudokuSolver(sudoku);
 
-            while (!FillWithRandomNumbers(sudoku)){
+            //Crée une nouvelle grille complète aléatoire
+            while (!FillWithRandomNumbers(sudoku))
+            {
                 sudoku = new Sudoku();
                 solver = new SudokuSolver(sudoku);
             }
 
+            //Cases pleines
+            List<SudokuCell> fullCells = new List<SudokuCell>();
+            foreach (SudokuCell cell in sudoku.Grid)
+            {
+                if (cell.Number != 0)
+                {
+                    fullCells.Add(cell);
+                }
+            }
 
-            /*
-            int lastX = 0, lastY = 0;
-            byte lastNumber = 0;
-
-            //Enlever des chiffres jusqu'a ce que le sudoku ne soit plus résolvable
             do
             {
+                int lastX = 0, lastY = 0;
+                byte lastNumber = 0;
 
-            } while (solver.IsSudokuSolvable());
+                //Enlever des chiffres jusqu'a ce que le sudoku ne soit plus résolvable
+                do
+                {
+                    int x = random.Next(sudoku.Length);
+                    int y = random.Next(sudoku.Length);
 
-            //Rajouter un chiffre pour qu'il le soit à nouveau
-            sudoku.Grid[lastY, lastX].EditNumber(lastNumber);
-            */
+                    SudokuCell currentCell = sudoku.Grid[y, x];
+
+                    if (currentCell.Number != 0)
+                    {
+                        lastX = x;
+                        lastY = y;
+                        lastNumber = currentCell.Number;
+
+                        currentCell.EditNumber(0);
+
+                        fullCells.Remove(currentCell);
+                    }
+                } while (solver.IsSudokuSolvable());
+
+                //Rajouter un chiffre pour qu'il le soit à nouveau
+                sudoku.Grid[lastY, lastX].EditNumber(lastNumber);
+                fullCells.Add(sudoku.Grid[lastY, lastX]);
+
+            } while (fullCells.Count > MAXIMUM_FULL_CELLS_IN_SUDOKU);
+
+            //Fixation des cases
+            foreach (SudokuCell cell in fullCells)
+            {
+                cell.IsFixed = true;
+            }
+
             return sudoku;
         }
 
@@ -71,14 +107,14 @@ namespace SudokuGame.Generator
             List<SudokuCell> emptyCells = new List<SudokuCell>();
             foreach (SudokuCell cell in sudoku.Grid)
             {
-                if(cell.Number == 0)
+                if (cell.Number == 0)
                 {
                     emptyCells.Add(cell);
                 }
             }
 
             //Remplissage de la première ligne et de la première colonne aléatoirement (accélère la suite)
-            for(int index = 0; index < sudoku.Length; index++)
+            for (int index = 0; index < sudoku.Length; index++)
             {
                 SudokuCell lineCell = sudoku.Grid[0, index];
                 SudokuCell columnCell = sudoku.Grid[index, 0];
@@ -88,7 +124,7 @@ namespace SudokuGame.Generator
                 {
                     //Récupération des possibilités
                     List<byte> possibilities = GetPossibleNumbersForCell(lineCell, sudoku);
-                    
+
                     //Placement d'un chiffre pour la ligne
                     if (possibilities.Count > 0)
                     {
@@ -120,7 +156,8 @@ namespace SudokuGame.Generator
             Stopwatch stopwatch = new Stopwatch();
 
             //Ajout aléatoire des chiffres dans la grille
-            Thread generationThread = new Thread(() => {
+            Thread generationThread = new Thread(() =>
+            {
                 RecursivePlaceRandomNumber(emptyCells, sudoku);
             });
 
@@ -142,13 +179,18 @@ namespace SudokuGame.Generator
                 }
 
                 //Retour du résultat
-                return false;            
+                return false;
             }
 
             return sudoku.IsCompleted();
         }
 
-
+        /// <summary>
+        /// Place récursivement des chiffres aléatoires dans le sudoku
+        /// </summary>
+        /// <param name="emptyCells"></param>
+        /// <param name="sudoku"></param>
+        /// <returns></returns>
         private bool RecursivePlaceRandomNumber(List<SudokuCell> emptyCells, Sudoku sudoku)
         {
             //Fin de la récursivité
@@ -164,26 +206,26 @@ namespace SudokuGame.Generator
             List<byte> possibilities = GetPossibleNumbersForCell(currentCell, sudoku);
 
             //Si pas de possibilités, retour de false
-            if(possibilities.Count == 0)
+            if (possibilities.Count == 0)
             {
                 return false;
             }
 
             //Essai de placement de chaque chiffre
-            while(possibilities.Count > 0)
+            while (possibilities.Count > 0)
             {
                 byte currentNumber = possibilities[random.Next(possibilities.Count)];
 
                 currentCell.EditNumber(currentNumber);
-                
+
                 //Si le sudoku est toujours possible à résoudre
-                if(solver.IsSudokuSolvableWithBruteForce())
+                if (solver.IsSudokuSolvableWithBruteForce())
                 {
                     emptyCells.Remove(currentCell);
 
                     //Placement du prochain chiffre
                     if (RecursivePlaceRandomNumber(emptyCells, sudoku))
-                    {   
+                    {
                         return true;
                     }
 

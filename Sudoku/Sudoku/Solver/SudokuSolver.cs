@@ -183,6 +183,8 @@ namespace SudokuGame.Solver
 
             SudokuCell[,] sudoku = CopySudoku();
 
+            PlaceSmallNumbers();
+
             result = this.sudoku.IsCompleted() ? true : RecursiveMethodicalSolveSudoku() == SolveState.Solved;
 
             RestoreCopy(sudoku);

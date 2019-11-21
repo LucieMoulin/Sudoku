@@ -9,6 +9,7 @@ using SudokuGame.SudokuObjects;
 using SudokuGame.Solver;
 using SudokuGame.Generator;
 using System.Threading;
+using System;
 
 namespace SudokuGame
 {
@@ -158,20 +159,7 @@ namespace SudokuGame
 
             UpdateSudoku();
         }
-
-        /// <summary>
-        /// Événement de fermeture de la fenêtre
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SudokuView_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (solveThread.IsAlive)
-            {
-                solveThread.Abort();
-            }
-        }
-
+        
         /// <summary>
         /// Événement de click du menu "Ouvrir"
         /// </summary>
@@ -228,6 +216,16 @@ namespace SudokuGame
             while (generationThread.IsAlive) ;
 
             DisplaySudoku();
+        }
+
+        /// <summary>
+        /// Fermeture de l'application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SudokuView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Environment.Exit(0); 
         }
     }
 }

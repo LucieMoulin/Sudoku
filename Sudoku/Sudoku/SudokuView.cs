@@ -39,7 +39,6 @@ namespace SudokuGame
 
             generator = new SudokuGenerator();
             sudoku = generator.NewRandomSudoku();
-            solver = new SudokuSolver(sudoku);
 
             cellGrid = new SudokuCellView[sudoku.Length, sudoku.Length];
 
@@ -85,7 +84,6 @@ namespace SudokuGame
                     }
 
                     cellGrid[y, x].Location = new Point(intX, intY);
-                    cellGrid[y, x].BackColor = SystemColors.Control;
                     Controls.Add(cellGrid[y, x]);
                 }
             }
@@ -134,11 +132,20 @@ namespace SudokuGame
         /// <param name="e"></param>
         private void SolveToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            if (solveThread is null ||solveThread.ThreadState != ThreadState.Unstarted)
+            //Parcours de la grille du sudoku, et affichage de chaque case.
+            for (int y = 0; y < sudoku.Length; y++)
+            {
+                for (int x = 0; x < sudoku.Length; x++)
+                {
+                    cellGrid[y, x].UpdateDisplay();
+                }
+            }
+
+            if (solveThread is null || solveThread.ThreadState != ThreadState.Unstarted)
             {
                 solveThread = new Thread(() =>
                 {
-                    solver = new SudokuSolver(sudoku);
+                    solver = new SudokuSolver(sudoku, this);
                     solver.SolveSudoku();
                 });
             }
@@ -150,7 +157,7 @@ namespace SudokuGame
                 control.Enabled = false;
             }
 
-            while (solveThread.IsAlive) ;
+            //while (solveThread.IsAlive) ;
 
             foreach (Control control in Controls)
             {
@@ -159,7 +166,7 @@ namespace SudokuGame
 
             UpdateSudoku();
         }
-        
+
         /// <summary>
         /// Événement de click du menu "Ouvrir"
         /// </summary>
@@ -198,7 +205,7 @@ namespace SudokuGame
         /// <param name="e"></param>
         private void NewSudokuToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            if(generationThread is null || generationThread.ThreadState != ThreadState.Unstarted)
+            if (generationThread is null || generationThread.ThreadState != ThreadState.Unstarted)
             {
                 generationThread = new Thread(() =>
                 {
@@ -225,7 +232,7 @@ namespace SudokuGame
         /// <param name="e"></param>
         private void SudokuView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Environment.Exit(0); 
+            Environment.Exit(0);
         }
     }
 }

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 using SudokuGame.SudokuObjects;
 
@@ -27,6 +28,17 @@ namespace SudokuGame.Solver
         }
 
         private Sudoku sudoku;
+        private SudokuView observer;
+
+        /// <summary>
+        /// Temps d'attente entre les mises à jour des observateurs
+        /// </summary>
+        private const int TIME = 50;
+
+        /// <summary>
+        /// Définis si les observateurs sont mis à jour en temps réel
+        /// </summary>
+        private const bool DISPLAY_REAL_TIME = true;
 
         /// <summary>
         /// Profondeur maximale du bruteforce (plus grand, plus lent, mais résoud des sudokus plus compliqués)
@@ -37,9 +49,11 @@ namespace SudokuGame.Solver
         /// Constructeur
         /// </summary>
         /// <param name="sudoku"></param>
-        public SudokuSolver(Sudoku sudoku)
+        /// <param name="observer"></param>
+        public SudokuSolver(Sudoku sudoku, SudokuView observer = null)
         {
             this.sudoku = sudoku;
+            this.observer = observer;
         }
 
         /// <summary>
@@ -210,6 +224,8 @@ namespace SudokuGame.Solver
                         {
                             //Ajout du petit chiffre
                             cell.AddSmallNumber(number);
+
+                            UpdateObservers();
                         }
                     }
                 }
@@ -228,6 +244,8 @@ namespace SudokuGame.Solver
                     cell.SmallNumbers.Clear();
                 }
             }
+
+            UpdateObservers();
         }
 
         /// <summary>
@@ -250,6 +268,9 @@ namespace SudokuGame.Solver
                     if (cell.SmallNumbers.Count == 1)
                     {
                         cell.EditNumber(cell.SmallNumbers[0]);
+
+                        UpdateObservers();
+
                         if (sudoku.IsCompleted())
                         {
 
@@ -274,8 +295,8 @@ namespace SudokuGame.Solver
                         break;
                 }
             }
-            
-            if(finalState == SolveState.Solving)
+
+            if (finalState == SolveState.Solving)
             {
                 return SolveState.UnableToSolve;
             }
@@ -319,6 +340,9 @@ namespace SudokuGame.Solver
                 if (counter == 1)
                 {
                     sudoku.Grid[line, index].EditNumber(i);
+
+                    UpdateObservers();
+
                     if (sudoku.IsCompleted())
                     {
 
@@ -329,7 +353,7 @@ namespace SudokuGame.Solver
                     {
                         //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(line, index, sudoku.Grid[line, index].Number);
-                        
+
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -405,6 +429,9 @@ namespace SudokuGame.Solver
                 if (counter == 1)
                 {
                     sudoku.Grid[index, column].EditNumber(i);
+
+                    UpdateObservers();
+
                     if (sudoku.IsCompleted())
                     {
 
@@ -415,7 +442,7 @@ namespace SudokuGame.Solver
                     {
                         //Enlève les petits chiffres devenus impossibles
                         RemoveSmallNumbers(index, column, sudoku.Grid[index, column].Number);
-                    
+
                         state = SolveState.FoundNumber;
                     }
                 }
@@ -500,6 +527,9 @@ namespace SudokuGame.Solver
                 if (counter == 1)
                 {
                     sudoku.Grid[indexY, indexX].EditNumber(i);
+
+                    UpdateObservers();
+
                     if (sudoku.IsCompleted())
                     {
                         //Sudoku terminé
@@ -577,6 +607,8 @@ namespace SudokuGame.Solver
             RemoveSmallNumbersFromLine(line, number);
             RemoveSmallNumbersFromColumn(column, number);
             RemoveSmallNumbersFromSquare(xMin, yMin, number);
+
+            UpdateObservers();
         }
 
         /// <summary>
@@ -769,6 +801,23 @@ namespace SudokuGame.Solver
                         sudoku.Grid[x, y].AddSmallNumber(smallNumber);
                     }
                 }
+            }
+
+            UpdateObservers();
+        }
+
+        /// <summary>
+        /// Mise à jour de l'observateur
+        /// </summary>
+        private void UpdateObservers()
+        {
+            if (DISPLAY_REAL_TIME && observer != null)
+            {
+                Thread.Sleep(TIME);
+                observer.Invoke((MethodInvoker)(() =>
+                {
+                    observer.UpdateSudoku();
+                }));
             }
         }
     }

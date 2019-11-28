@@ -16,6 +16,11 @@ namespace SudokuGame
     /// </summary>
     public partial class SudokuCellView : UserControl
     {
+        private Color focusColor = Color.Gray;
+        private Color normalColor = Color.White;
+        private Color fixedColor = Color.LightGray;
+        private bool isDemoMode = true;
+
         private SudokuCell cell;
         private string mainNumber
         {
@@ -134,6 +139,8 @@ namespace SudokuGame
                 mainNumber = cell.Number.ToString();
             }
 
+            BackColor = cell.IsFixed ? fixedColor : normalColor;
+
             UpdateSmallNumbersDisplay();
         }
 
@@ -150,6 +157,8 @@ namespace SudokuGame
             }
 
             UpdateSmallNumbersDisplay();
+
+            BackColor = ChangeColor();
         }
 
         /// <summary>
@@ -467,14 +476,50 @@ namespace SudokuGame
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>
+        /// Définis une couleur en fonction du nombre de petits chiffres (Design : Lucas Charbonnier)
+        /// </summary>
+        /// <returns></returns>
+        private Color ChangeColor()
+        {
+            if (isDemoMode)
+            {
+                fixedColor = Color.FromArgb(0, 255, 0);
+                normalColor = Color.FromArgb(255, 255, 255);
+
+                labelSmallNumbers1.Text = "";
+                labelSmallNumbers2.Text = "";
+
+                if (cell.Number == 0)
+                {
+                    if (cell.SmallNumbers.Count > 2)
+                    {
+                        return Color.FromArgb(255, 255 - (255 / 7) * (cell.SmallNumbers.Count - 2), 255 - (255 / 7) * (cell.SmallNumbers.Count - 2));
+                    }
+                    else
+                    {
+                        return Color.FromArgb(255 - (255 / 3) * (3 - cell.SmallNumbers.Count), 255, 255 - (255 / 3) * (3 - cell.SmallNumbers.Count));
+                    }
+                }
+                else
+                {
+                    return fixedColor;
+                }
+            }
+            else
+            {
+                return cell.IsFixed ? SystemColors.ControlLight : SystemColors.Control;
+            }
+        }
+
         private void SudokuCellView_Enter(object sender, EventArgs e)
         {
-            BackColor = SystemColors.ControlDark;
+            BackColor = focusColor;
         }
 
         private void SudokuCellView_Leave(object sender, EventArgs e)
         {
-            BackColor = SystemColors.Control;
+            BackColor = cell.IsFixed ? fixedColor : normalColor;
         }
 
         private void LabelSmallNumbers2_Click(object sender, EventArgs e)

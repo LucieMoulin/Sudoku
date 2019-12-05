@@ -157,7 +157,10 @@ namespace SudokuGame
                 control.Enabled = false;
             }
 
-            //while (solveThread.IsAlive) ;
+            if (!SudokuSolver.DISPLAY_REAL_TIME)
+            {
+                while (solveThread.IsAlive) ;
+            }
 
             foreach (Control control in Controls)
             {

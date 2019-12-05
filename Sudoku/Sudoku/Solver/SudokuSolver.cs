@@ -33,12 +33,12 @@ namespace SudokuGame.Solver
         /// <summary>
         /// Temps d'attente entre les mises à jour des observateurs
         /// </summary>
-        private const int TIME = 50;
+        private const int TIME = 100;
 
         /// <summary>
         /// Définis si les observateurs sont mis à jour en temps réel
         /// </summary>
-        private const bool DISPLAY_REAL_TIME = true;
+        public const bool DISPLAY_REAL_TIME = true;
 
         /// <summary>
         /// Profondeur maximale du bruteforce (plus grand, plus lent, mais résoud des sudokus plus compliqués)

@@ -20,7 +20,7 @@ namespace SudokuGame.Generator
         private Random random;
         private SudokuSolver solver;
         private const int MAX_GENERATION_TIME = 500;
-        private const int MAXIMUM_FULL_CELLS_IN_SUDOKU = 27;
+        private const int MAXIMUM_FULL_CELLS_IN_SUDOKU = 26;
 
         /// <summary>
         /// Constructeur
@@ -39,7 +39,7 @@ namespace SudokuGame.Generator
             Sudoku sudoku = new Sudoku();
 
             solver = new SudokuSolver(sudoku);
-
+            
             //Crée une nouvelle grille complète aléatoire
             while (!FillWithRandomNumbers(sudoku))
             {

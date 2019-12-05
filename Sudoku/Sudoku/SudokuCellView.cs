@@ -487,9 +487,6 @@ namespace SudokuGame
                 fixedColor = Color.FromArgb(0, 255, 0);
                 normalColor = Color.FromArgb(255, 255, 255);
 
-                labelSmallNumbers1.Text = "";
-                labelSmallNumbers2.Text = "";
-
                 if (cell.Number == 0)
                 {
                     if (cell.SmallNumbers.Count > 2)
